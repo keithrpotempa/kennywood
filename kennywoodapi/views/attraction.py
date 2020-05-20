@@ -91,6 +91,12 @@ class Attractions(ViewSet):
             Response -- JSON serialized list of attractions
         """
         attractions = Attraction.objects.all()
+        # If area is provided as a query parameter, 
+        # then filter list of attractions by area id
+        area = self.request.query_params.get('area', None)
+        if area is not None:
+            attractions = attractions.filter(area__id=area)
+        
         serializer = AttractionSerializer(
             attractions, many=True, context={'request': request})
         return Response(serializer.data)

@@ -20,6 +20,7 @@ class ItinerarySerializer(serializers.HyperlinkedModelSerializer):
             lookup_field='id'
         )
         fields = ('id', 'url', 'starttime', 'attraction_id', 'customer_id')
+        depth = 2
 
 
 class Itineraries(ViewSet):
@@ -92,7 +93,14 @@ class Itineraries(ViewSet):
         Returns:
             Response -- JSON serialized list of Itineraries
         """
-        Itineraries = Itinerary.objects.all()
+        itineraries = Itinerary.objects.all()
+        
+        # If customer_id is provided as a query parameter, 
+        # then filter list of attractions by customer id
+        customer = self.request.query_params.get('customer', None)
+        if customer is not None:
+            itineraries = itineraries.filter(customer__id=customer)
+        
         serializer = ItinerarySerializer(
-            Itineraries, many=True, context={'request': request})
+            itineraries, many=True, context={'request': request})
         return Response(serializer.data)
