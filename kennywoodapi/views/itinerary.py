@@ -4,7 +4,7 @@ from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers
 from rest_framework import status
-from kennywoodapi.models import Itinerary
+from kennywoodapi.models import Attraction, Customer, Itinerary
 
 
 class ItinerarySerializer(serializers.HyperlinkedModelSerializer):
@@ -19,7 +19,7 @@ class ItinerarySerializer(serializers.HyperlinkedModelSerializer):
             view_name='itinerary',
             lookup_field='id'
         )
-        fields = ('id', 'url', 'starttime', 'attraction_id', 'customer_id')
+        fields = ('id', 'url', 'starttime', 'attraction',)
         depth = 2
 
 
@@ -93,13 +93,15 @@ class Itineraries(ViewSet):
         Returns:
             Response -- JSON serialized list of Itineraries
         """
-        itineraries = Itinerary.objects.all()
+        customer = Customer.objects.get(user=request.auth.user)
+        
+        itineraries = Itinerary.objects.filter(customer=customer)
         
         # If customer_id is provided as a query parameter, 
         # then filter list of attractions by customer id
-        customer = self.request.query_params.get('customer', None)
-        if customer is not None:
-            itineraries = itineraries.filter(customer__id=customer)
+        # customer = self.request.query_params.get('customer', None)
+        # if customer is not None:
+        #     itineraries = itineraries.filter(customer__id=customer)
         
         serializer = ItinerarySerializer(
             itineraries, many=True, context={'request': request})
