@@ -24,11 +24,19 @@ def login_user(request):
         username = req_body['username']
         password = req_body['password']
         authenticated_user = authenticate(username=username, password=password)
+        # KP: adding this to try and get this to return userid
+        # user = serializer.validated_data['user']
 
         # If authentication was successful, respond with their token
         if authenticated_user is not None:
             token = Token.objects.get(user=authenticated_user)
-            data = json.dumps({"valid": True, "token": token.key})
+            data = json.dumps(
+                {
+                    "valid": True, 
+                    "user_id": authenticated_user.id,
+                    "token": token.key
+                }
+            )
             return HttpResponse(data, content_type='application/json')
 
         else:
@@ -70,5 +78,5 @@ def register_user(request):
     token = Token.objects.create(user=new_user)
 
     # Return the token to the client
-    data = json.dumps({"token": token.key})
+    data = json.dumps({"token": token.key, "user_id": authenticated_user.id})
     return HttpResponse(data, content_type='application/json')
