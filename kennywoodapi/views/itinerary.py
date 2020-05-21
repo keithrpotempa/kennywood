@@ -19,7 +19,7 @@ class ItinerarySerializer(serializers.HyperlinkedModelSerializer):
             view_name='itinerary',
             lookup_field='id'
         )
-        fields = ('id', 'url', 'starttime', 'attraction',)
+        fields = ('id', 'url', 'starttime', 'attraction_id', 'attraction',)
         depth = 2
 
 
@@ -65,10 +65,12 @@ class Itineraries(ViewSet):
         Returns:
             Response -- Empty body with 204 status code
         """
+        
+        attraction = Attraction.objects.get(pk=request.data["attraction_id"])
+        
         itinerary = Itinerary.objects.get(pk=pk)
         itinerary.starttime = request.data["starttime"]
-        itinerary.attraction_id = request.data["attraction_id"]
-        itinerary.customer_id = request.data["customer_id"]
+        itinerary.attraction = attraction
         itinerary.save()
 
         return Response({}, status=status.HTTP_204_NO_CONTENT)
