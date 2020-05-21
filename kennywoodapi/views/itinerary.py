@@ -32,10 +32,14 @@ class Itineraries(ViewSet):
         Returns:
             Response -- JSON serialized Itinerary instance
         """
+        
+        attraction = Attraction.objects.get(pk=request.data["attraction_id"])
+        customer = Customer.objects.get(user=request.auth.user)
+
         newitinerary = Itinerary()
         newitinerary.starttime = request.data["starttime"]
-        newitinerary.attraction_id = request.data["attraction_id"]
-        newitinerary.customer_id = request.data["customer_id"]
+        newitinerary.attraction = attraction
+        newitinerary.customer = customer
         newitinerary.save()
 
         serializer = ItinerarySerializer(newitinerary, context={'request': request})
