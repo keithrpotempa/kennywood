@@ -66,10 +66,10 @@ class Itineraries(ViewSet):
             Response -- Empty body with 204 status code
         """
         
-        attraction = Attraction.objects.get(pk=request.data["attraction_id"])
         
         itinerary = Itinerary.objects.get(pk=pk)
         itinerary.starttime = request.data["starttime"]
+        attraction = Attraction.objects.get(pk=request.data["attraction_id"])
         itinerary.attraction = attraction
         itinerary.save()
 
